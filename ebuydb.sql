@@ -1,0 +1,320 @@
+------------------------------------------------------------------------
+--                       DATOS CREACION
+------------------------------------------------------------------------
+/*
+Database Name: ebuydb
+User Name: ebuydb
+Password: ebuydb
+*/
+------------------------------------------------------------------------
+--                         BORRADO DE TABLAS
+------------------------------------------------------------------------
+/*
+DROP TABLE PRODUCT_KEYWORD;
+DROP TABLE REVIEW;
+DROP TABLE PURCHASED_PRODUCT;
+DROP TABLE PRODUCT;
+DROP TABLE KEYWORD;
+DROP TABLE SUBCATEGORY;
+DROP TABLE CATEGORY;
+DROP TABLE ACCOUNT;
+*/
+------------------------------------------------------------------------
+--                         CREACION DE TABLAS
+------------------------------------------------------------------------
+CREATE TABLE ACCOUNT(
+    USER_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	NICKNAME VARCHAR(20) NOT NULL,
+	EMAIL VARCHAR(50) NOT NULL,
+	PASSWORD VARCHAR(20) NOT NULL,
+	ISADMIN SMALLINT NOT NULL,
+    PRIMARY KEY (USER_ID)	
+);
+ALTER TABLE ACCOUNT 
+    ADD CONSTRAINT "NICKNAME_UNIQUE" UNIQUE ( NICKNAME );
+
+ALTER TABLE ACCOUNT 
+    ADD CONSTRAINT "EMAIL_UNIQUE" UNIQUE ( EMAIL );
+------------------------------------------------------------------------
+CREATE TABLE CATEGORY (
+    CATEGORY_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    NAME VARCHAR(30) NOT NULL,
+	PRIMARY KEY (CATEGORY_ID)
+);
+
+ALTER TABLE CATEGORY
+ADD CONSTRAINT NAME_UNIQUE_CATEGORY UNIQUE (NAME); 
+------------------------------------------------------------------------
+CREATE TABLE SUBCATEGORY (
+    SUBCATEGORY_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    NAME VARCHAR(30) NOT NULL,
+	CATEGORY_ID INTEGER NOT NULL,
+	PRIMARY KEY (SUBCATEGORY_ID)
+);
+
+ALTER TABLE SUBCATEGORY 
+	ADD FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY;
+
+ALTER TABLE SUBCATEGORY
+ADD CONSTRAINT NAME_UNIQUE_SUBCATEGORY UNIQUE (NAME); 
+------------------------------------------------------------------------
+CREATE TABLE KEYWORD (
+    KEYWORD_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    NAME VARCHAR(30) NOT NULL,
+	PRIMARY KEY (KEYWORD_ID)
+);
+
+ALTER TABLE KEYWORD
+ADD CONSTRAINT NAME_UNIQUE_KEYWORD UNIQUE (NAME); 
+------------------------------------------------------------------------
+CREATE TABLE PRODUCT (
+    PRODUCT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	TITLE VARCHAR(50) NOT NULL,
+	DESCRIPTION VARCHAR(1020),
+	PRICE DOUBLE,
+	PHOTO_URL VARCHAR(510),
+	CREATION_DATE DATE NOT NULL,
+	VENDOR_ID INTEGER NOT NULL,
+    QUANTITY INTEGER NOT NULL,
+	SUBCATEGORY_ID INTEGER NOT NULL,
+	CREATION_TIME TIME NOT NULL,
+    PRIMARY KEY (PRODUCT_ID)	
+);
+
+ALTER TABLE PRODUCT 
+	ADD FOREIGN KEY (SUBCATEGORY_ID) REFERENCES SUBCATEGORY;
+ALTER TABLE PRODUCT 
+	ADD FOREIGN KEY (VENDOR_ID) REFERENCES ACCOUNT;
+------------------------------------------------------------------------
+CREATE TABLE PURCHASED_PRODUCT (
+    PURCHASE_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+    PRODUCT_ID INTEGER NOT NULL,
+    BUYER_ID INTEGER NOT NULL,
+    PURCHASE_DATE DATE NOT NULL,
+    QUANTITY INTEGER NOT NULL,
+    PRICE DOUBLE NOT NULL,
+	PRIMARY KEY (PURCHASE_ID)
+);
+
+ALTER TABLE PURCHASED_PRODUCT 
+	ADD FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT;
+ALTER TABLE PURCHASED_PRODUCT 
+	ADD FOREIGN KEY (BUYER_ID) REFERENCES ACCOUNT;
+
+------------------------------------------------------------------------
+CREATE TABLE REVIEW (
+    REVIEW_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+	PURCHASE_ID INTEGER NOT NULL,
+	USER_ID INTEGER NOT NULL,
+	REVIEW_DATE DATE NOT NULL,
+	STARS DOUBLE NOT NULL,
+	COMMENT VARCHAR(510),
+	PRIMARY KEY (REVIEW_ID)
+);
+
+ALTER TABLE REVIEW
+ADD CONSTRAINT REVIEW_UNIQUE_PER_PURCHASE UNIQUE (PURCHASE_ID); 
+ALTER TABLE REVIEW 
+	ADD FOREIGN KEY (PURCHASE_ID) REFERENCES PURCHASED_PRODUCT;
+ALTER TABLE REVIEW 
+	ADD FOREIGN KEY (USER_ID) REFERENCES ACCOUNT;
+------------------------------------------------------------------------
+CREATE TABLE PRODUCT_KEYWORD (
+   	KEYWORD_ID INTEGER NOT NULL,
+   	PRODUCT_ID INTEGER NOT NULL,
+	PRIMARY KEY (KEYWORD_ID,PRODUCT_ID)
+);
+
+ALTER TABLE PRODUCT_KEYWORD 
+	ADD FOREIGN KEY (PRODUCT_ID) REFERENCES PRODUCT;
+ALTER TABLE PRODUCT_KEYWORD 
+	ADD FOREIGN KEY (KEYWORD_ID) REFERENCES KEYWORD;
+
+------------------------------------------------------------------------
+--                         DATOS
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--                         USUARIOS 
+------------------------------------------------------------------------
+
+INSERT INTO EBUYDB.ACCOUNT (NICKNAME, EMAIL, PASSWORD, ISADMIN) -- id=1
+	VALUES ('admin', 'admin@ebuy.com', 'admin', 1);
+	
+INSERT INTO EBUYDB.ACCOUNT (NICKNAME, EMAIL, PASSWORD, ISADMIN) -- id=2
+	VALUES ('user', 'user@ebuy.com', 'user', 0);
+	
+INSERT INTO ACCOUNT (NICKNAME,EMAIL,PASSWORD,ISADMIN) -- id=3
+	VALUES ('u1','u1@sample.com','u1', 0);
+
+INSERT INTO ACCOUNT (NICKNAME,EMAIL,PASSWORD,ISADMIN) -- id=4
+	VALUES ('u2','u2@sample.com','u2', 0);
+
+INSERT INTO ACCOUNT (NICKNAME,EMAIL,PASSWORD,ISADMIN) -- id=5
+	VALUES ('u3','u3@sample.com','u3', 0);
+
+INSERT INTO ACCOUNT (NICKNAME,EMAIL,PASSWORD,ISADMIN) -- id=6
+	VALUES ('u4','u4@sample.com','u4', 0);
+
+INSERT INTO ACCOUNT (NICKNAME,EMAIL,PASSWORD,ISADMIN) -- id=7
+	VALUES ('u5','u5@sample.com','u5', 0);
+
+
+------------------------------------------------------------------------
+--                         CATEGORIAS
+------------------------------------------------------------------------
+INSERT INTO CATEGORY (NAME) --id=1
+	VALUES ('deportes');
+INSERT INTO CATEGORY (NAME) --id=2
+	VALUES ('electronica');
+INSERT INTO CATEGORY (NAME) --id=3
+	VALUES ('comida');
+INSERT INTO CATEGORY (NAME) --id=4
+	VALUES ('videojuegos');
+INSERT INTO CATEGORY (NAME) --id=5
+	VALUES ('hogar');
+
+------------------------------------------------------------------------
+--                         SUBCATEGORIAS
+------------------------------------------------------------------------
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=1
+	VALUES ('deportes',1);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=2
+	VALUES ('aire-libre',1);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=3
+	VALUES ('agua',1);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=4
+	VALUES ('electronica',2);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=5
+	VALUES ('ordenadores',2);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=6
+	VALUES ('moviles',2);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=7
+	VALUES ('televisiones',2);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=8
+	VALUES ('bebida',3);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=9
+	VALUES ('lacteos',3);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=10
+	VALUES ('snacks',3);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=11
+	VALUES ('italiana',3);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=12
+	VALUES ('multiplataforma',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=13
+	VALUES ('accesorios',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=14
+	VALUES ('PC',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=15
+	VALUES ('Nintendo',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=16
+	VALUES ('Sony',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=17
+	VALUES ('Microsoft',4);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=18
+	VALUES ('hogar',5);
+INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) --id=19
+    VALUES ('bebes', 5);
+INSERT INTO SUBCATEGORY (NAME, CATEGORY_ID) --id=20
+    VALUES ('electrodomesticos', 5);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=21
+	VALUES ('interior',1);
+INSERT INTO SUBCATEGORY (NAME,CATEGORY_ID) --id=22
+	VALUES ('comida',3);
+
+------------------------------------------------------------------------
+--                         PRODUCTO
+------------------------------------------------------------------------
+--id=1
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+	VALUES ('Animal Crossing', 'JUEGAZO', 60.0, 'https://sgfm.elcorteingles.es/SGFM/dctm/MEDIA03/202001/13/00197580504765____4__640x640.jpg', '2020-03-24', 5, 20, 15, '20:05:00');
+--id=2
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+	VALUES ('bici', 'bici muy bonita', 230.0, 'https://fabricbike.com/63-large_default/fixie-light.jpg', '2020-03-21', 2, 6, 2, '17:20:00');
+--id=3
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+	VALUES ('yogur', 'yogur stracciatella sin lactosa', 2.0, 'https://sgfm.elcorteingles.es/SGFM/dctm/MEDIA03/201708/31/00118823001013____6__600x600.jpg', '2020-03-21', 2, 10, 9, '10:05:00');
+--id=4
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+	VALUES ('Life Fitness Tomahawk IC1 Bicicleta Indoor', 'La Life Fitness Tomahawk IC1 aporta una increible experiencia con las bicis indoor a tu hogar.Con ingenieria provada de ICG, esta bici esta hecha para durar mas. Gracias a su marco elegante, la Life Fitness IC1 entra perfectamente en cualquier espacio. ', 795.0, 'https://www.gymcompany.es/media/catalog/product/cache/1/thumbnail/9df78eab33525d08d6e5fb8d27136e95/i/c/ic1-02-1000x1000.jpg', '2020-04-06', 2, 5, 21, '15:10:00');
+--id=5
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+	VALUES ('Salmorejo', 'Salmorejo Mercadona', 2.5, 'https://s1.eestatic.com/2019/04/30/ciencia/nutricion/Tomate-Precios-Aceite_de_oliva-Ajo-Pimiento-OCU_Organizacion_de_Consumidores_y_Usuarios-Nutricion_394972210_121694460_1706x1280.jpg', '2020-04-06', 2, 3, 22, '15:05:00');
+--id=6
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+    VALUES ('Pizza jamon y queso', 'Pizza jamon y queso marca ristorante', 3.49, 'https://sgfm.elcorteingles.es/SGFM/dctm/MEDIA03/201810/23/00118950100968____2__600x600.jpg', '2020-04-17', 2, 8, 11, '09:45:00');
+--id=7    
+INSERT INTO EBUYDB.PRODUCT (TITLE, DESCRIPTION, PRICE, PHOTO_URL, CREATION_DATE, VENDOR_ID, QUANTITY, SUBCATEGORY_ID, CREATION_TIME) 
+    VALUES ('salsa barbacoa', 'assad', 12.0, 'https://distribucionesplata.com/tienda/18564-thickbox_default/salsa-heinz-barbacoa-220-ml.jpg', '2020-04-20', 2, 10, 22, '22:47:50');
+------------------------------------------------------------------------
+--                         KEYWORD
+------------------------------------------------------------------------
+INSERT INTO EBUYDB.KEYWORD ("NAME")  --id=1
+	VALUES ('deporte');
+INSERT INTO EBUYDB.KEYWORD ("NAME")  --id=2
+	VALUES ('enCasa');
+INSERT INTO EBUYDB.KEYWORD ("NAME")  --id=3
+	VALUES ('lacteos');
+INSERT INTO EBUYDB.KEYWORD ("NAME")  --id=4
+	VALUES ('nuevos');
+
+------------------------------------------------------------------------
+--                         PRODUCT_KEYWORD
+------------------------------------------------------------------------
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (1, 4);
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (2, 1);
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (2, 4);
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (2, 5);
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (4, 1);
+INSERT INTO EBUYDB.PRODUCT_KEYWORD (KEYWORD_ID, PRODUCT_ID) 
+	VALUES (4, 5);
+
+------------------------------------------------------------------------
+--                         COMPRAS
+------------------------------------------------------------------------
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (6, 3, '2020-04-21', 3, 3.49);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (4, 3, '2020-04-21', 1, 795.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (1, 2, '2020-04-21', 3, 60.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (7, 4, '2020-04-21', 1, 12.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (3, 4, '2020-04-21', 4, 2.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (5, 4, '2020-04-21', 1, 2.5);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (2, 4, '2020-04-21', 2, 230.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (4, 6, '2020-04-21', 1, 795.0);
+INSERT INTO EBUYDB.PURCHASED_PRODUCT (PRODUCT_ID, BUYER_ID, PURCHASE_DATE, QUANTITY, PRICE) 
+    VALUES (2, 6, '2020-04-21', 1, 230.0);
+    
+
+------------------------------------------------------------------------
+--                         REVIEWS
+------------------------------------------------------------------------
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (1, 3, '2020-04-21', 5.0, 'Muy rica');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (2, 3, '2020-04-21', 3.5, 'Demasiado cara');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (3, 2, '2020-04-21', 5.0, 'GOTY');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (4, 4, '2020-04-21', 3.5, 'Prefiero la de Hacendado');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (5, 4, '2020-04-21', 5.0, 'Perfecto para intolerantes :)');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (6, 4, '2020-04-21', 4.5, 'En El Corte Inglés está menos bueno.');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (7, 4, '2020-04-21', 1.0, 'No puedo usarla en el confinamiento');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (8, 6, '2020-04-21', 5.0, 'Muy buena');
+INSERT INTO EBUYDB.REVIEW (PURCHASE_ID, USER_ID, REVIEW_DATE, STARS, COMMENT) 
+    VALUES (9, 6, '2020-04-21', 3.0, 'Color muy feo.');
+
